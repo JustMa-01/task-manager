@@ -11,11 +11,10 @@ function addTask() {
     if (task) {
         const li = document.createElement("li");
         li.innerHTML = `
+            <input type="checkbox" onclick="markComplete(this)" />
             <span>${task}</span>
-            <div>
-                <button onclick="markComplete(this)">Complete</button>
-                <button onclick="removeTask(this)">Remove</button>
-            </div>`;
+            <button onclick="removeTask(this)">Remove</button>
+        `;
         taskList.appendChild(li);
 
         saveTask(task);
@@ -34,18 +33,17 @@ function loadTasks() {
     tasks.forEach(({ name, completed }) => {
         const li = document.createElement("li");
         li.innerHTML = `
+            <input type="checkbox" ${completed ? 'checked' : ''} onclick="markComplete(this)" />
             <span class="${completed ? 'completed' : ''}">${name}</span>
-            <div>
-                <button onclick="markComplete(this)">Complete</button>
-                <button onclick="removeTask(this)">Remove</button>
-            </div>`;
+            <button onclick="removeTask(this)">Remove</button>
+        `;
         document.getElementById("taskList").appendChild(li);
     });
 }
 
 function removeTask(button) {
-    const li = button.parentElement.parentElement; // Get the parent li
-    const taskText = li.firstChild.textContent;
+    const li = button.parentElement; // Get the parent li
+    const taskText = li.querySelector('span').textContent;
     let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
     tasks = tasks.filter(task => task.name !== taskText);
     localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -53,19 +51,19 @@ function removeTask(button) {
 }
 
 // Function to mark tasks as completed
-function markComplete(button) {
-    const li = button.parentElement.parentElement; // Get the parent li
-    const taskText = li.firstChild.textContent;
+function markComplete(checkbox) {
+    const li = checkbox.parentElement; // Get the parent li
+    const taskText = li.querySelector('span').textContent;
     let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
     tasks.forEach(task => {
         if (task.name === taskText) {
-            task.completed = !task.completed; // Toggle completion status
+            task.completed = checkbox.checked; // Update completion status based on checkbox
         }
     });
 
     localStorage.setItem("tasks", JSON.stringify(tasks));
-    li.firstChild.classList.toggle('completed'); // Toggle completed class for styling
+    li.querySelector('span').classList.toggle('completed', checkbox.checked); // Toggle completed class for styling
 }
 
 // Theme toggle function
